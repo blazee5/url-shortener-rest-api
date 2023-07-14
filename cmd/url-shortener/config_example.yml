@@ -1,0 +1,12 @@
+env: "dev"
+db_host: "localhost"
+db_port: "27017"
+db_user: "user"
+db_password: "password"
+db_name: "url-shortener"
+
+http_host:
+  host: "localhost"
+  port: "8080"
+  timeout: 4s
+  idle_timeout: 60s

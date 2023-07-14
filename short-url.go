@@ -1,6 +1,6 @@
-package url_shortener_rest
+package models
 
 type ShortUrl struct {
-	URL   string `bson:"url"`
-	Alias string `bson:"alias"`
+	ID  string `bson:"_id"`
+	URL string `bson:"url"`
 }

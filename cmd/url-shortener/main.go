@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"github.com/blazee5/url-shortener-rest-api/internal/config"
 	sl "github.com/blazee5/url-shortener-rest-api/internal/lib/logger/slog"
 	"github.com/blazee5/url-shortener-rest-api/internal/storage/mongodb"
@@ -29,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, err = mongodb.NewDAO(context.Background(), client.DB)
+	_, err = mongodb.NewDAO(client.DB)
 	if err != nil {
 		log.Error("failed to init DAO", sl.Err(err))
 	}

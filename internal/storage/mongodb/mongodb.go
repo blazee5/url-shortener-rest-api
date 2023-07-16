@@ -41,7 +41,7 @@ func NewDAO(client *mongo.Client) (*UrlDAO, error) {
 	}, nil
 }
 
-func (dao *UrlDAO) Insert(ctx context.Context, shortUrl *models.ShortUrl) error {
+func (dao *UrlDAO) SaveUrl(ctx context.Context, shortUrl *models.ShortUrl) error {
 	_, err := dao.c.InsertOne(ctx, shortUrl)
 	if err != nil {
 		return err

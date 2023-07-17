@@ -63,10 +63,20 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		if alias == "" {
 			alias = random.NewRandomString(aliasLength)
 		}
-		err = urlSaver.SaveURL(r.Context(), &models.ShortUrl{
-			ID:  alias,
-			URL: req.URL,
-		})
+
+		for i := 1; i <= 10; i++ {
+			err = urlSaver.SaveURL(r.Context(), &models.ShortUrl{
+				ID:  alias,
+				URL: req.URL,
+			})
+
+			if err == nil {
+				break
+			}
+
+			alias = random.NewRandomString(aliasLength)
+		}
+
 		if errors.Is(err, errors.New("url exists")) {
 			log.Info("url already exists", slog.String("url", req.URL))
 

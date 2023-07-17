@@ -41,7 +41,7 @@ func NewDAO(client *mongo.Client) (*UrlDAO, error) {
 	}, nil
 }
 
-func (dao *UrlDAO) SaveUrl(ctx context.Context, shortUrl *models.ShortUrl) error {
+func (dao *UrlDAO) SaveURL(ctx context.Context, shortUrl *models.ShortUrl) error {
 	_, err := dao.c.InsertOne(ctx, shortUrl)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (dao *UrlDAO) SaveUrl(ctx context.Context, shortUrl *models.ShortUrl) error
 	return nil
 }
 
-func (dao *UrlDAO) GetUrl(ctx context.Context, alias string) (string, error) {
+func (dao *UrlDAO) GetURL(ctx context.Context, alias string) (string, error) {
 	filter := bson.D{{"_id", alias}}
 	var URL models.ShortUrl
 	err := dao.c.FindOne(ctx, filter).Decode(&URL)
@@ -61,7 +61,7 @@ func (dao *UrlDAO) GetUrl(ctx context.Context, alias string) (string, error) {
 	return URL.URL, nil
 }
 
-func (dao *UrlDAO) DeleteUrl(ctx context.Context, alias string) error {
+func (dao *UrlDAO) DeleteURL(ctx context.Context, alias string) error {
 	filter := bson.D{{"_id", alias}}
 	_, err := dao.c.DeleteOne(ctx, filter)
 	if err != nil {

@@ -2,6 +2,7 @@ package save
 
 import (
 	"context"
+	"errors"
 	models "github.com/blazee5/url-shortener-rest-api"
 	"github.com/blazee5/url-shortener-rest-api/internal/lib/api/response"
 	sl "github.com/blazee5/url-shortener-rest-api/internal/lib/logger/slog"
@@ -26,8 +27,9 @@ type Response struct {
 	Alias  string `json:"alias,omitempty"`
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.32.0 --name=URLSaver
 type URLSaver interface {
-	SaveUrl(ctx context.Context, shortUrl *models.ShortUrl) error
+	SaveURL(ctx context.Context, shortUrl *models.ShortUrl) error
 }
 
 func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
@@ -40,7 +42,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			log.Error("failed to decode request body", sl.Err(err))
 
 			render.JSON(w, r, Response{
-				Status: "error",
+				Status: "Error",
 				Error:  "failed to decode request",
 			})
 
@@ -61,10 +63,20 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		if alias == "" {
 			alias = random.NewRandomString(aliasLength)
 		}
-		err = urlSaver.SaveUrl(context.Background(), &models.ShortUrl{
+		err = urlSaver.SaveURL(r.Context(), &models.ShortUrl{
 			ID:  alias,
 			URL: req.URL,
 		})
+		if errors.Is(err, errors.New("url exists")) {
+			log.Info("url already exists", slog.String("url", req.URL))
+
+			render.JSON(w, r, Response{
+				Status: "Error",
+				Error:  "url already exists",
+			})
+
+			return
+		}
 		if err != nil {
 			log.Error("failed to add url", sl.Err(err))
 

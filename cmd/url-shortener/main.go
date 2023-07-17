@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/blazee5/url-shortener-rest-api/internal/config"
+	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/redirect"
+	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/url/delete"
 	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/url/save"
 	sl "github.com/blazee5/url-shortener-rest-api/internal/lib/logger/slog"
 	"github.com/blazee5/url-shortener-rest-api/internal/storage/mongodb"
@@ -38,7 +40,9 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
 
-	r.Post("/api/url", save.New(log, dao))
+	r.Post("/url", save.New(log, dao))
+	r.Get("/{alias}", redirect.New(log, dao))
+	r.Delete("/{alias}", delete.Delete(log, dao))
 
 	log.Info(fmt.Sprintf("starting server on %s:%s", cfg.Host, cfg.Port))
 

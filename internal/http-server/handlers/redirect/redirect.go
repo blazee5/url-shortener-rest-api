@@ -36,7 +36,7 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 			return
 		}
 
-		resURL, err := urlGetter.GetURL(r.Context(), alias)
+		resURL, err := urlGetter.GetURL(context.Background(), alias)
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			log.Info("failed to get url", "alias", alias)
 

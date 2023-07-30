@@ -17,6 +17,7 @@ type URLDeleter interface {
 	DeleteURL(ctx context.Context, alias string) error
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.32.0 --name=URLDeleter
 func Delete(log *slog.Logger, urlDeleter URLDeleter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log = log.With(
@@ -29,13 +30,13 @@ func Delete(log *slog.Logger, urlDeleter URLDeleter) http.HandlerFunc {
 
 			render.JSON(w, r, response.Response{
 				Status: "Error",
-				Error:  "invalid request",
+				Error:  "alias is empty",
 			})
 
 			return
 		}
 
-		err := urlDeleter.DeleteURL(r.Context(), alias)
+		err := urlDeleter.DeleteURL(context.Background(), alias)
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			log.Info("failed to delete url", "alias", alias)
 

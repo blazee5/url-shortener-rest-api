@@ -41,7 +41,7 @@ func TestSaveHandler(t *testing.T) {
 			urlGetterMock := mocks.NewURLGetter(t)
 
 			if tc.respError == "" || tc.mockError != nil {
-				if tc.alias != "" { // Проверка, что alias не пустой перед вызовом GetURL
+				if tc.alias != "" { // Check if alias is empty before run GetURL
 					urlGetterMock.On("GetURL", context.Background(), tc.alias).
 						Return(tc.url, tc.mockError).Once()
 				}
@@ -53,7 +53,7 @@ func TestSaveHandler(t *testing.T) {
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 
-			if tc.alias == "" { // Проверка, что alias пустой
+			if tc.alias == "" { // Check if alias is empty
 				_, err := api.GetRedirect(ts.URL + "/" + tc.alias)
 
 				assert.Error(t, err)

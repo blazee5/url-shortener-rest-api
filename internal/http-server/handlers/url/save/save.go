@@ -57,15 +57,14 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			log.Error("invalid request", sl.Err(err))
 
 			render.JSON(w, r, response.ValidationError(validateErr))
+
+			return
 		}
 
 		alias := req.Alias
-		if alias == "" {
-			alias = random.NewRandomString(aliasLength)
-		}
 
 		for i := 1; i <= 10; i++ {
-			err = urlSaver.SaveURL(r.Context(), &models.ShortUrl{
+			err = urlSaver.SaveURL(context.Background(), &models.ShortUrl{
 				ID:  alias,
 				URL: req.URL,
 			})

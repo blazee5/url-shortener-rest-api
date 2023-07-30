@@ -47,7 +47,7 @@ func TestDeleteHandler(t *testing.T) {
 			if tc.respError == "" || tc.mockError != nil {
 				if tc.alias != "" {
 					URLDeleterMock.On("DeleteURL", context.Background(), tc.alias).
-						Return(tc.mockError)
+						Return(tc.mockError).Once()
 				}
 			}
 

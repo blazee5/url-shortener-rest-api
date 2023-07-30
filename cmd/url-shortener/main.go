@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/blazee5/url-shortener-rest-api/internal/config"
 	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/redirect"
@@ -33,6 +34,12 @@ func main() {
 	if err != nil {
 		log.Error("failed to init DAO", sl.Err(err))
 	}
+
+	defer func() {
+		if err = client.DB.Disconnect(context.Background()); err != nil {
+			log.Error("failed to close database connection", sl.Err(err))
+		}
+	}()
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)

@@ -22,11 +22,6 @@ func Run(cfg *config.Config) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
-	//defer func() {
-	//	if err = client.Disconnect(context.Background()); err != nil {
-	//		panic(err)
-	//	}
-	//}()
 
 	return &Storage{DB: client}, nil
 }

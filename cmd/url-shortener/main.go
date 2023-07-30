@@ -14,6 +14,8 @@ import (
 	"golang.org/x/exp/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -35,12 +37,6 @@ func main() {
 		log.Error("failed to init DAO", sl.Err(err))
 	}
 
-	defer func() {
-		if err = client.DB.Disconnect(context.Background()); err != nil {
-			log.Error("failed to close database connection", sl.Err(err))
-		}
-	}()
-
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
@@ -61,7 +57,21 @@ func main() {
 		IdleTimeout:  cfg.IdleTimeout,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		log.Error("failed to start server", sl.Err(err))
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Error("failed to start server", sl.Err(err))
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		log.Error("failed while stopping server", sl.Err(err))
+	}
+
+	if err := client.DB.Disconnect(context.Background()); err != nil {
+		log.Error("failed while stopping database", sl.Err(err))
 	}
 }

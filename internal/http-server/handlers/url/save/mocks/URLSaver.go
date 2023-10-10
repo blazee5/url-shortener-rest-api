@@ -5,7 +5,6 @@ package mocks
 import (
 	context "context"
 
-	models "github.com/blazee5/url-shortener-rest-api"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -14,13 +13,13 @@ type URLSaver struct {
 	mock.Mock
 }
 
-// SaveUrl provides a mock function with given fields: ctx, shortUrl
-func (_m *URLSaver) SaveURL(ctx context.Context, shortUrl *models.ShortUrl) error {
-	ret := _m.Called(ctx, shortUrl)
+// SaveURL provides a mock function with given fields: ctx, urlToSave, alias
+func (_m *URLSaver) SaveURL(ctx context.Context, urlToSave string, alias string) error {
+	ret := _m.Called(ctx, urlToSave, alias)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *models.ShortUrl) error); ok {
-		r0 = rf(ctx, shortUrl)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, urlToSave, alias)
 	} else {
 		r0 = ret.Error(0)
 	}

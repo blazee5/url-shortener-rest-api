@@ -36,8 +36,12 @@ func NewDAO(client *mongo.Client) (*UrlDAO, error) {
 	}, nil
 }
 
-func (dao *UrlDAO) SaveURL(ctx context.Context, shortUrl *models.ShortUrl) error {
-	_, err := dao.c.InsertOne(ctx, shortUrl)
+func (dao *UrlDAO) SaveURL(ctx context.Context, urlToSave string, alias string) error {
+	_, err := dao.c.InsertOne(ctx, models.ShortUrl{
+		ID:  alias,
+		URL: urlToSave,
+	})
+
 	if err != nil {
 		return err
 	}

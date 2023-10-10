@@ -3,14 +3,14 @@ package save
 import (
 	"context"
 	"errors"
-	models "github.com/blazee5/url-shortener-rest-api"
+	"net/http"
+
 	"github.com/blazee5/url-shortener-rest-api/internal/lib/api/response"
 	sl "github.com/blazee5/url-shortener-rest-api/internal/lib/logger/slog"
 	"github.com/blazee5/url-shortener-rest-api/internal/lib/random"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/slog"
-	"net/http"
 )
 
 // TODO: move to config
@@ -29,7 +29,7 @@ type Response struct {
 
 //go:generate go run github.com/vektra/mockery/v2@v2.32.0 --name=URLSaver
 type URLSaver interface {
-	SaveURL(ctx context.Context, shortUrl *models.ShortUrl) error
+	SaveURL(ctx context.Context, urlToSave string, alias string) error
 }
 
 func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
@@ -62,12 +62,12 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		}
 
 		alias := req.Alias
+		if alias == "" {
+			alias = random.NewRandomString(aliasLength)
+		}
 
 		for i := 1; i <= 10; i++ {
-			err = urlSaver.SaveURL(context.Background(), &models.ShortUrl{
-				ID:  alias,
-				URL: req.URL,
-			})
+			err = urlSaver.SaveURL(context.Background(), req.URL, alias)
 
 			if err == nil {
 				break

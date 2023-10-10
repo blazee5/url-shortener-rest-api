@@ -3,6 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/blazee5/url-shortener-rest-api/internal/config"
 	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/redirect"
 	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/url/delete"
@@ -11,11 +16,8 @@ import (
 	"github.com/blazee5/url-shortener-rest-api/internal/storage/mongodb"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"golang.org/x/exp/slog"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
@@ -39,6 +41,7 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
+	r.Use(cors.Handler(cors.Options{}))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)

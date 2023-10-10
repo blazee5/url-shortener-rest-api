@@ -1,14 +1,16 @@
-package save
+package save_test
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	_ "github.com/blazee5/url-shortener-rest-api"
-	models "github.com/blazee5/url-shortener-rest-api"
+	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/url/save"
 	"github.com/blazee5/url-shortener-rest-api/internal/http-server/handlers/url/save/mocks"
 	"github.com/blazee5/url-shortener-rest-api/internal/lib/logger/handlers/slogdiscard"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
@@ -45,6 +47,13 @@ func TestSaveHandler(t *testing.T) {
 			alias:     "some_alias",
 			respError: "field URL is not a valid URL",
 		},
+		{
+			name:      "SaveURL Error",
+			alias:     "test_alias",
+			url:       "https://google.com",
+			respError: "failed to add url",
+			mockError: errors.New("unexpected error"),
+		},
 	}
 
 	for _, tc := range cases {
@@ -56,30 +65,25 @@ func TestSaveHandler(t *testing.T) {
 			urlSaverMock := mocks.NewURLSaver(t)
 
 			if tc.respError == "" || tc.mockError != nil {
-				if tc.url != "" {
-					urlSaverMock.On("SaveURL", context.Background(), &models.ShortUrl{
-						ID:  tc.alias,
-						URL: tc.url,
-					}).
-						Return(tc.mockError).Once()
-				}
+				urlSaverMock.On("SaveURL", context.Background(), mock.AnythingOfType("string"), tc.url).
+					Return(tc.mockError)
 			}
 
-			handler := New(slogdiscard.NewDiscardLogger(), urlSaverMock)
+			handler := save.New(slogdiscard.NewDiscardLogger(), urlSaverMock)
 
 			input := fmt.Sprintf(`{"url": "%s", "alias": "%s"}`, tc.url, tc.alias)
 
-			req, err := http.NewRequest(http.MethodPost, "/url", bytes.NewReader([]byte(input)))
+			req, err := http.NewRequest(http.MethodPost, "/save", bytes.NewReader([]byte(input)))
 			require.NoError(t, err)
 
 			rr := httptest.NewRecorder()
 			handler.ServeHTTP(rr, req)
 
-			require.Equal(t, http.StatusOK, rr.Code)
+			require.Equal(t, rr.Code, http.StatusOK)
 
 			body := rr.Body.String()
 
-			var resp Response
+			var resp save.Response
 
 			require.NoError(t, json.Unmarshal([]byte(body), &resp))
 

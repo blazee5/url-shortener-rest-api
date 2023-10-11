@@ -65,7 +65,7 @@ func TestSaveHandler(t *testing.T) {
 			urlSaverMock := mocks.NewURLSaver(t)
 
 			if tc.respError == "" || tc.mockError != nil {
-				urlSaverMock.On("SaveURL", context.Background(), mock.AnythingOfType("string"), tc.url).
+				urlSaverMock.On("SaveURL", context.Background(), tc.url, mock.AnythingOfType("string")).
 					Return(tc.mockError)
 			}
 

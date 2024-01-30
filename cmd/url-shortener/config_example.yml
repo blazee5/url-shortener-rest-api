@@ -5,7 +5,7 @@ db_user: "user"
 db_password: "password"
 db_name: "url-shortener"
 
-http_host:
+http_server:
   host: "localhost"
   port: "8080"
   timeout: 4s

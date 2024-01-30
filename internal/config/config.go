@@ -13,7 +13,7 @@ type Config struct {
 	DBUser     string `yaml:"db_user" env:"DB_USER" env-default:"user"`
 	DBPassword string `yaml:"db_password" env:"DB_PASSWORD" env-default:"password"`
 	DBName     string `yaml:"db_name" env:"DB_NAME" env-default:"url-shortener"`
-	HttpServer
+	HttpServer `yaml:"http_server"`
 }
 
 type HttpServer struct {

@@ -53,7 +53,7 @@ func main() {
 	log.Info(fmt.Sprintf("starting server on %s:%s", cfg.Host, cfg.Port))
 
 	srv := &http.Server{
-		Addr:         fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
+		Addr:         fmt.Sprintf(":%s", cfg.Port),
 		Handler:      r,
 		ReadTimeout:  cfg.Timeout,
 		WriteTimeout: cfg.Timeout,

@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
 
 type Storage struct {
@@ -15,12 +16,14 @@ type Storage struct {
 }
 
 func Run(cfg *config.Config) (*Storage, error) {
-	opts := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s@%s:%s/",
-		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort))
-	client, err := mongo.Connect(context.Background(), opts)
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", cfg.DBHost, cfg.DBPort)))
 
 	if err != nil {
-		return nil, err
+		log.Fatal("Error connecting to database: ", err)
+	}
+
+	if err = client.Ping(context.Background(), nil); err != nil {
+		log.Fatal("Error connecting to database: ", err)
 	}
 
 	return &Storage{DB: client}, nil
